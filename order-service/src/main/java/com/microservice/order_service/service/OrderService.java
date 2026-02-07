@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     public boolean placeOrder(OrderRequest orderRequest) {
 
@@ -24,8 +24,8 @@ public class OrderService {
                 .map(OrderLineItemsDto::getSkuCode)
                 .toList();
 
-        InventoryResponse[] skuCodes = webClient.get()
-                .uri("http://localhost:8082/api/inventory",
+        InventoryResponse[] skuCodes = webClientBuilder.build().get()
+                .uri("http://inventory-service/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodeList).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
