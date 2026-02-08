@@ -2,18 +2,22 @@ package com.microservice.inventory_service.service;
 
 import com.microservice.inventory_service.dto.InventoryResponse;
 import com.microservice.inventory_service.model.Inventory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+@Slf4j
 @Service
 public class InventoryService {
 
-    public List<InventoryResponse> isInStock(List<String> skuCodes) {
+    public List<InventoryResponse> isInStock(List<String> skuCodes) throws InterruptedException {
         List<Inventory> inventoryList = getInventoryList();
-
+        log.info("Wait started");
+        Thread.sleep(10000);
+        log.info("Wait ended");
         List<String> inventorySkuList = inventoryList.stream().map(Inventory::getSkuCode).toList();
         boolean isPresent = new HashSet<>(inventorySkuList).containsAll(skuCodes);
         if (isPresent) {

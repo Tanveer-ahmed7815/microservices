@@ -2,6 +2,7 @@ package com.microservice.order_service.controller;
 
 import com.microservice.order_service.dto.OrderRequest;
 import com.microservice.order_service.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/order")
@@ -19,8 +23,10 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String placeOrder(@RequestBody OrderRequest orderRequest) {
-        if (orderService.placeOrder(orderRequest)) return "Order placed Successfully";
+    public String placeOrder(@RequestBody OrderRequest orderRequest) throws ExecutionException, InterruptedException {
+        CompletableFuture<Boolean> booleanCompletableFuture = orderService.placeOrder(orderRequest);
+
+        if (booleanCompletableFuture.get()) return "Order placed Successfully";
         else return "No stock";
 
     }
